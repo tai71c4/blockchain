@@ -1,0 +1,23 @@
+{
+  "name": "nft-marketplace-backend",
+  "version": "1.0.0",
+  "description": "NFT Marketplace Smart Contract on Cronos Testnet",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network cronosTestnet",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "node": "hardhat node",
+    "verify": "hardhat verify --network cronosTestnet"
+  },
+  "keywords": ["nft", "marketplace", "cronos", "blockchain", "solidity"],
+  "author": "Student Project",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@openzeppelin/contracts": "^4.9.0",
+    "hardhat": "^2.17.0",
+    "dotenv": "^16.3.1"
+  }
+}
