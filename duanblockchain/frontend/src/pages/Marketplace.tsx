@@ -53,8 +53,25 @@ const Marketplace: React.FC<MarketplaceProps> = ({ wallet }) => {
       
       const items = await Promise.all(data.map(async (item: any) => {
         try {
+          // Skip if token is sold or invalid
+          if (item.sold || item.tokenId.toString() === '0') {
+            return null;
+          }
+          
           const tokenUri = await contract.tokenURI(item.tokenId);
-          const meta = await fetch(tokenUri).then(res => res.json());
+          
+          // Skip if tokenURI is empty or invalid
+          if (!tokenUri || tokenUri === '') {
+            console.log(`Token ${item.tokenId} has no URI, skipping...`);
+            return null;
+          }
+          
+          const meta = await fetch(tokenUri).then(res => res.json()).catch(() => ({
+            name: `NFT #${item.tokenId}`,
+            description: 'No metadata available',
+            image: ''
+          }));
+          
           setNftMetadata(prev => ({
             ...prev,
             [item.tokenId.toString()]: meta
@@ -75,7 +92,8 @@ const Marketplace: React.FC<MarketplaceProps> = ({ wallet }) => {
             creator: item.creator,
           };
         } catch (error) {
-          console.error('Error loading NFT metadata:', error);
+          console.error(`Error loading NFT metadata for token ${item.tokenId}:`, error);
+          // Return null to filter out problematic tokens
           return null;
         }
       }));

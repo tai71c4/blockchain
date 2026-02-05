@@ -57,8 +57,10 @@ function App() {
     }
   };
 
-  const handleAccountsChanged = (accounts: string[]) => {
+  const handleAccountsChanged = async (accounts: string[]) => {
+    console.log('Account changed:', accounts);
     if (accounts.length === 0) {
+      // User disconnected
       setWallet({
         provider: null,
         signer: null,
@@ -67,11 +69,26 @@ function App() {
         connected: false,
       });
     } else {
-      handleConnect();
+      // User switched accounts - force reconnect
+      try {
+        const walletData = await connectWallet();
+        setWallet({
+          provider: walletData.provider,
+          signer: walletData.signer,
+          address: walletData.address,
+          balance: walletData.balance,
+          connected: true,
+        });
+        console.log('Switched to account:', walletData.address);
+      } catch (error) {
+        console.error('Error switching account:', error);
+      }
     }
   };
 
   const handleChainChanged = () => {
+    console.log('Chain changed, reloading...');
+    // Force page reload to ensure clean state
     window.location.reload();
   };
 
@@ -127,9 +144,14 @@ function App() {
                     <span className="address">{formatAddress(wallet.address)}</span>
                     <span className="balance">{parseFloat(wallet.balance).toFixed(4)} TCRO</span>
                   </div>
-                  <button onClick={handleDisconnect} className="disconnect-btn">
-                    Ngắt kết nối
-                  </button>
+                  <div className="wallet-actions">
+                    <button onClick={handleConnect} className="refresh-btn" title="Refresh account">
+                      🔄
+                    </button>
+                    <button onClick={handleDisconnect} className="disconnect-btn">
+                      Ngắt kết nối
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <button 
